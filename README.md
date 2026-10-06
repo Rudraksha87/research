@@ -369,3 +369,5 @@ npm run dev
 ## 📜 License
 
 Built for the **AI for Research & Knowledge Discovery** Hackathon. Distributed under the MIT License.
+#   r e s e a r c h  
+ 
