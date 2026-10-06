@@ -26,7 +26,9 @@ export const LoginPage = () => {
       await login(email, password);
       navigate(from, { replace: true });
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid email or password. Please try again.');
+      console.error('Login error:', err);
+      const msg = err.response?.data?.message || err.message || 'Invalid email or password. Please try again.';
+      setError(msg);
     } finally {
       setIsLoading(false);
     }

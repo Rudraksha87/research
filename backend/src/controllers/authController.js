@@ -18,7 +18,33 @@ const register = async (req, res) => {
     }
 
     if (existingUser) {
-      return res.status(409).json({ success: false, message: 'An account with this email address already exists.' });
+      if (!isConfigured || !supabase) {
+        // In local in-memory development mode, seamlessly update password and log researcher in
+        existingUser.password_hash = await hashPassword(password);
+        existingUser.full_name = fullName;
+        existingUser.organization = organization || existingUser.organization;
+
+        const token = generateToken({
+          userId: existingUser.id,
+          email: existingUser.email,
+          fullName: existingUser.full_name
+        });
+
+        return res.status(200).json({
+          success: true,
+          message: 'Account updated and signed in successfully.',
+          token,
+          user: {
+            id: existingUser.id,
+            email: existingUser.email,
+            fullName: existingUser.full_name,
+            organization: existingUser.organization,
+            role: existingUser.role
+          }
+        });
+      }
+
+      return res.status(409).json({ success: false, message: 'An account with this email address already exists. Please log in.' });
     }
 
     const passwordHash = await hashPassword(password);
@@ -75,12 +101,12 @@ const login = async (req, res) => {
     }
 
     if (!user) {
-      return res.status(401).json({ success: false, message: 'Invalid email or password.' });
+      return res.status(401).json({ success: false, message: 'No account found with this email. Please register or check your email.' });
     }
 
     const isMatch = await comparePassword(password, user.password_hash);
     if (!isMatch) {
-      return res.status(401).json({ success: false, message: 'Invalid email or password.' });
+      return res.status(401).json({ success: false, message: 'Incorrect password. Please verify your credentials and try again.' });
     }
 
     const token = generateToken({

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Sparkles, Lock, Mail, User, Building, ArrowRight } from 'lucide-react';
+import { Sparkles, Lock, Mail, User, Building, ArrowRight, UserCheck } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import Button from '../components/common/Button';
 import ErrorMessage from '../components/common/ErrorMessage';
@@ -16,6 +16,13 @@ export const RegisterPage = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
 
+  const handleFillDemo = () => {
+    setFullName('Dr. Alex Rivera');
+    setEmail('dr.alex@researchlens.ai');
+    setOrganization('Center for Neural Computing & AI Labs');
+    setPassword('Password123!');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -30,7 +37,9 @@ export const RegisterPage = () => {
       });
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. Please check your credentials.');
+      console.error('Registration error:', err);
+      const msg = err.response?.data?.message || err.message || 'Registration failed. Please check your credentials.';
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
@@ -47,6 +56,17 @@ export const RegisterPage = () => {
           </div>
           <h2 className="text-2xl font-bold text-white tracking-tight">Create your account</h2>
           <p className="text-xs text-slate-400">Join leading scientists using autonomous literature synthesis</p>
+        </div>
+
+        {/* Quick Demo Fill Box */}
+        <div className="p-3.5 rounded-xl bg-blue-950/20 border border-blue-500/30 flex items-center justify-between">
+          <div className="text-xs text-blue-300">
+            <p className="font-semibold">Quick Demo Account</p>
+            <p className="text-[11px] text-blue-400/80">Pre-fill credentials for instant hackathon testing</p>
+          </div>
+          <Button size="sm" variant="outline" icon={UserCheck} onClick={handleFillDemo}>
+            Fill Demo
+          </Button>
         </div>
 
         {error && <ErrorMessage message={error} />}
